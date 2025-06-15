@@ -3,6 +3,7 @@ import streamlit as st
 from app.config import load_config
 from app.bedrock_client import BedrockClient
 from app.document_chat import DocumentChatManager
+from app.research_agent import ResearchAgent
 
 # Streamlit UI
 def main():
@@ -25,7 +26,7 @@ def main():
     st.sidebar.header("Configuration")
     app_mode = st.sidebar.selectbox(
         "Choose Application Mode",
-        ["Educational Content Creator", "Code Generation", "Document Summary", "Document Chat"]
+        ["Educational Content Creator", "Code Generation", "Document Summary", "Document Chat", "Research Assistant"]
     )
     
     model_choice = st.sidebar.selectbox(
@@ -196,6 +197,126 @@ def main():
         
         else:
             st.info("👆 Please upload a document to start chatting!")
+    
+    elif app_mode == "Research Assistant":
+        st.header("🔬 Research Assistant")
+        st.markdown("An AI agent with multiple tools to help you research, calculate, analyze text, and more!")
+        
+        # Initialize research agent
+        if 'research_agent' not in st.session_state:
+            try:
+                st.session_state.research_agent = ResearchAgent(st.session_state.genai_app.claude_llm)
+                st.success("✅ Research Assistant initialized!")
+            except Exception as e:
+                st.error(f"❌ Failed to initialize Research Assistant: {str(e)}")
+                st.stop()
+        
+        # Show available tools
+        with st.expander("🛠️ Available Tools", expanded=False):
+            tools = st.session_state.research_agent.get_available_tools()
+            for tool in tools:
+                st.write(f"**{tool['name']}**: {tool['description']}")
+        
+        # Research interface
+        st.subheader("💭 Ask the Research Assistant")
+        
+        # Initialize research chat history
+        if 'research_chat_history' not in st.session_state:
+            st.session_state.research_chat_history = []
+        
+        # Display chat history
+        if st.session_state.research_chat_history:
+            st.write("**Research History:**")
+            for i, chat in enumerate(st.session_state.research_chat_history):
+                with st.container():
+                    st.write(f"**You:** {chat['query']}")
+                    
+                    if chat['success']:
+                        st.write(f"**Research Assistant:** {chat['response']}")
+                        
+                        # Show tools used
+                        if chat.get('tools_used'):
+                            with st.expander(f"🔧 Tools used in response {i+1}"):
+                                st.write(f"Available tools: {', '.join(chat['tools_used'])}")
+                    else:
+                        st.error(f"**Error:** {chat['response']}")
+                    
+                    st.write("---")
+        
+        # Research input
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            research_query = st.text_area(
+                "What would you like to research or analyze?",
+                height=100,
+                placeholder="Examples:\n- Calculate the square root of 144\n- Analyze this text: 'Your text here'\n- What is the current date and time?\n- Tell me about Python programming\n- How many days between 2024-01-01 and 2024-12-31?"
+            )
+        
+        with col2:
+            st.write("**Example Queries:**")
+            if st.button("📊 Calculate √144", key="calc_example"):
+                research_query = "Calculate the square root of 144"
+            
+            if st.button("📅 Current Date", key="date_example"):
+                research_query = "What is the current date and time?"
+            
+            if st.button("📝 Analyze Text", key="text_example"):
+                research_query = "Analyze this text: LangChain is a framework for developing applications powered by language models."
+        
+        # Research button
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            if st.button("🔍 Research", key="research_btn"):
+                if research_query:
+                    with st.spinner("Research Assistant is working..."):
+                        try:
+                            result = st.session_state.research_agent.research(research_query)
+                            
+                            # Add to chat history
+                            st.session_state.research_chat_history.append({
+                                'query': research_query,
+                                'success': result['success'],
+                                'response': result['response'],
+                                'tools_used': result['tools_used'],
+                                'error': result['error']
+                            })
+                            
+                            st.rerun()
+                            
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+                else:
+                    st.warning("Please enter a research query!")
+        
+        with col2:
+            if st.button("🗑️ Clear History", key="clear_research"):
+                st.session_state.research_chat_history = []
+                st.session_state.research_agent.clear_memory()
+                st.success("Research history cleared!")
+                st.rerun()
+        
+        # Tips section
+        with st.expander("💡 Tips for Using the Research Assistant"):
+            st.markdown("""
+            **Calculator Tool:**
+            - Use for math: `2+2`, `sqrt(16)`, `10*5/2`, `sin(pi/2)`
+            - Supports: +, -, *, /, ^, sqrt, sin, cos, tan, log, pi, e
+            
+            **Text Analyzer Tool:**
+            - Paste any text to get word count, character count, reading time
+            - Finds most frequent words and basic statistics
+            
+            **DateTime Tool:**
+            - Get current date/time: "current" or "now"
+            - Calculate date differences: "days between 2024-01-01 and 2024-12-31"
+            
+            **Agent Capabilities:**
+            - The agent can use multiple tools in sequence
+            - It remembers conversation context
+            - It can reason about which tools to use for your query
+            """)
 
 if __name__ == "__main__":
     main()

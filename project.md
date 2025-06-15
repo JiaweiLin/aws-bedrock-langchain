@@ -34,9 +34,8 @@ aws-bedrock-langchain/
 ## Key Features
 
 ### 1. **Multi-Model Support**
-- **Claude 4 Sonnet** (`anthropic.claude-sonnet-4-20250514-v1:0`) - Primary conversational AI
+- **Claude 3.5 Sonnet V2** (`us.anthropic.claude-3-5-sonnet-20241022-v2:0`) - Primary conversational AI
 - **Amazon Titan** (`amazon.titan-embed-text-v2:0`) - Text generation and embeddings
-- **Deepseek-R1** - Specialized reasoning model (mentioned in README but not implemented in current code)
 
 ### 2. **Multiple Interaction Modes**
 - **CLI Interface** (`main.py`) - Command-line interaction with streaming/non-streaming options
