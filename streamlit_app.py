@@ -25,7 +25,7 @@ def main():
     st.sidebar.header("Configuration")
     app_mode = st.sidebar.selectbox(
         "Choose Application Mode",
-        ["AI Chat & Generation", "Code Generation", "Document Summary", "Document Chat"]
+        ["Educational Content Creator", "Code Generation", "Document Summary", "Document Chat"]
     )
     
     model_choice = st.sidebar.selectbox(
@@ -34,7 +34,7 @@ def main():
     )
     
     # Main content area
-    if app_mode == "AI Chat & Generation":
+    if app_mode == "Educational Content Creator":
         st.header("📚 Educational Content Generator")
         st.markdown("Generate content using conversational AI")
     
