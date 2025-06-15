@@ -30,7 +30,6 @@ requests
 streamlit
 streamlit-mermaid
 typing-extensions
-langfuse
 # Document processing dependencies
 pypdf2
 python-docx
