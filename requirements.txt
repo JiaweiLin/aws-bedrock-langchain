@@ -36,3 +36,4 @@ python-docx
 faiss-cpu
 langchain-text-splitters
 chromadb
+pysqlite3-binary==0.5.4
