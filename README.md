@@ -16,8 +16,6 @@ The new Research Assistant uses LangChain agents with the following tools:
 - **Calculator Tool** - Mathematical calculations (basic math, trigonometry, logarithms)
 - **Text Analyzer Tool** - Text statistics, word count, reading time, keyword analysis
 - **DateTime Tool** - Current date/time, date calculations, time differences
-- **Knowledge Base Tool** - General knowledge about technology, science, and programming
-- **File Operations Tool** - File operations (read, write, list files in current directory)
 
 ## 🏗️ Architecture
 
@@ -103,24 +101,6 @@ Response: Uses Text Analyzer Tool → Provides word count, reading time, statist
 ```
 Query: "What is the current date and time?"
 Response: Uses DateTime Tool → "Current date and time: 2024-06-15 22:24:00"
-```
-
-### Knowledge Queries
-```
-Query: "Tell me about Python programming"
-Response: Uses Knowledge Base Tool → Information about Python language
-```
-
-### File Operations
-```
-Query: "list" 
-Response: Uses File Operations Tool → Lists files in current directory
-
-Query: "read:filename.txt"
-Response: Uses File Operations Tool → Reads and displays file content
-
-Query: "write:test.txt:Hello World"
-Response: Uses File Operations Tool → Writes content to file
 ```
 
 ## 📁 Project Structure
